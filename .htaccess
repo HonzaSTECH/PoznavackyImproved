@@ -2,6 +2,12 @@ Options -Indexes
 
 RewriteEngine On
 
+# Vynucení SSL
+RewriteCond %{HTTP:X-Forwarded-Proto} !https
+SetEnvIf X-Forwarded-Proto "https" HTTPS=on
+RewriteCond %{HTTPS} !=on
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
 # Pokud server bude mít problémy se správným zpracováním přesměrování, může pomoci odkomentování následujícího řádku
 # RewriteBase /
 
@@ -14,7 +20,8 @@ RewriteCond %{REQUEST_URI} !^/browserconfig\.xml$
 RewriteCond %{REQUEST_URI} !^/site\.webmanifest$
 
 # Povolení přímého přístupu k souborům s danými příponami
-RewriteRule !\.(css|js|txt|ico|xml|svg|gif|png|jpg|gz)$ index.php [L]
+RewriteCond %{REQUEST_URI} !\.(css|js|txt|odt|apkg|ico|xml|svg|gif|png|jpg|gz|map)$
+RewriteRule ^ index.php [L]
 
 # Nastavení .phtml souborů jako .php soubory
 AddType application/x-httpd-php .php .phtml
@@ -60,3 +67,18 @@ AddType application/x-httpd-php .php .phtml
         Header set Cache-Control "max-age=604800, public"
     </filesMatch>
 </IfModule>
+
+# Blokace url-probing adres (v repozitáři jenom několik adres pro ukázku)
+<RequireAll>
+    Require all granted
+    Require not ip 66.249.76.95
+    Require not ip 109.228.60.57
+    Require not ip 88.214.43.118
+    Require not ip 2001:1600:10:100::b04
+    Require not ip 52.138.251.163
+    Require not ip 34.171.194.55
+    Require not ip 52.164.121.210
+    Require not ip 164.152.20.174
+    Require not ip 35.87.23.125
+    Require not ip 54.175.209.76
+</RequireAll>
